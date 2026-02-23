@@ -27,12 +27,12 @@ const FeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-black py-20 border-t border-b border-white/10">
+    <section className="bg-black py-16 md:py-20 border-t border-b border-white/10 overflow-hidden">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full">
         {features.map((f, idx) => (
           <div 
             key={idx} 
-            className={`flex flex-col items-center text-center p-16 space-y-8 transition-all duration-500 hover:bg-white/[0.02]
+            className={`flex flex-col items-center text-center p-8 md:p-16 space-y-6 md:space-y-8 transition-all duration-500 hover:bg-white/[0.02]
               ${idx !== features.length - 1 ? 'lg:border-r border-white/10' : ''}
               ${idx < 2 ? 'border-b lg:border-b-0' : ''}
               group

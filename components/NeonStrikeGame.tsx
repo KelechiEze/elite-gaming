@@ -66,7 +66,8 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
     powerType: 'NORMAL' as 'NORMAL' | 'TRIPLE' | 'RAPID',
     frame: 0,
     stage: currentStage,
-    stageThreshold: currentStage * 1000
+    stageThreshold: currentStage * 1000,
+    scale: 1 // Zoom factor for mobile
   });
 
   // Sync stage from props
@@ -84,25 +85,37 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
+      
+      // Calculate scale factor: on small screens, we "zoom out" 
+      // by making the virtual coordinate space larger.
+      const minDim = Math.min(canvas.width, canvas.height);
+      if (minDim < 600) {
+        gameState.current.scale = minDim / 800; // Zoom out on mobile
+      } else {
+        gameState.current.scale = 1;
+      }
     };
     window.addEventListener('resize', resize);
     resize();
 
     const spawnEnemy = (time: number) => {
       const state = gameState.current;
-      // Difficulty scales with stage
       const stageMultiplier = 1 + (state.stage - 1) * 0.5;
       const currentSpawnRate = Math.max(300, (2000 - (state.score / 5)) / stageMultiplier);
 
       if (time - state.lastEnemySpawn > currentSpawnRate) {
         const side = Math.floor(Math.random() * 4);
         let x = 0, y = 0;
-        const margin = 100;
+        
+        // Use a virtual margin that accounts for scale
+        const margin = 150 / state.scale;
+        const vWidth = canvas.width / state.scale;
+        const vHeight = canvas.height / state.scale;
 
-        if (side === 0) { x = Math.random() * canvas.width; y = -margin; }
-        else if (side === 1) { x = canvas.width + margin; y = Math.random() * canvas.height; }
-        else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + margin; }
-        else { x = -margin; y = Math.random() * canvas.height; }
+        if (side === 0) { x = Math.random() * vWidth; y = -margin; }
+        else if (side === 1) { x = vWidth + margin; y = Math.random() * vHeight; }
+        else if (side === 2) { x = Math.random() * vWidth; y = vHeight + margin; }
+        else { x = -margin; y = Math.random() * vHeight; }
 
         const isBoss = state.score > 0 && state.score % 1000 === 0 && !state.enemies.some(e => e.type === 'BOSS');
         
@@ -142,21 +155,21 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
       }
       
       const state = gameState.current;
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
+      const vWidth = canvas.width / state.scale;
+      const vHeight = canvas.height / state.scale;
+      const centerX = vWidth / 2;
+      const centerY = vHeight / 2;
 
       state.frame++;
       state.playerAngle = Math.atan2(state.mousePos.y - centerY, state.mousePos.x - centerX);
 
       spawnEnemy(time);
 
-      // Stage Completion Check
       if (state.score >= state.stageThreshold && state.stage < 5) {
         onStageComplete(state.stage);
-        state.stageThreshold += 1000; // Increment for internal tracking
+        state.stageThreshold += 1000;
       }
 
-      // Power-up Timer
       if (state.powerTimer > 0) {
         state.powerTimer--;
         if (state.powerTimer === 0) {
@@ -165,7 +178,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         }
       }
 
-      // Update Power-ups
       state.powerUps = state.powerUps.filter(p => {
         p.life -= 0.005;
         const dist = Math.hypot(centerX - p.x, centerY - p.y);
@@ -179,14 +191,12 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         return p.life > 0;
       });
 
-      // Update Bullets
       state.bullets = state.bullets.filter(b => {
         b.x += b.vx;
         b.y += b.vy;
-        return b.x > 0 && b.x < canvas.width && b.y > 0 && b.y < canvas.height;
+        return b.x > -100 && b.x < vWidth + 100 && b.y > -100 && b.y < vHeight + 100;
       });
 
-      // Update Enemies
       state.enemies.forEach((e, eIdx) => {
         const angle = Math.atan2(centerY - e.y, centerX - e.x);
         e.x += Math.cos(angle) * e.speed;
@@ -194,7 +204,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         e.angle += 0.02;
         e.pulse += 0.1;
 
-        // Collision with Player/Core
         const distToPlayer = Math.hypot(centerX - e.x, centerY - e.y);
         if (distToPlayer < 40) {
           state.enemies.splice(eIdx, 1);
@@ -210,7 +219,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
           }
         }
 
-        // Collision with Bullets
         state.bullets.forEach((b, bIdx) => {
           const dist = Math.hypot(b.x - e.x, b.y - e.y);
           if (dist < e.radius + 10) {
@@ -224,7 +232,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
               state.score += e.type === 'BOSS' ? 500 : 10;
               setScore(state.score);
               
-              // Drop Power-up
               if (Math.random() > 0.85) {
                 const types: ('TRIPLE' | 'RAPID' | 'SHIELD')[] = ['TRIPLE', 'RAPID', 'SHIELD'];
                 state.powerUps.push({
@@ -238,7 +245,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         });
       });
 
-      // Update Particles
       state.particles = state.particles.filter(p => {
         p.x += p.vx;
         p.y += p.vy;
@@ -256,39 +262,42 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
     const draw = () => {
       if (!ctx) return;
       const state = gameState.current;
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-
+      
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Chromatic Aberration Effect
+      ctx.save();
+      // Apply Virtual Zoom
+      ctx.scale(state.scale, state.scale);
+      
+      const vWidth = canvas.width / state.scale;
+      const vHeight = canvas.height / state.scale;
+      const centerX = vWidth / 2;
+      const centerY = vHeight / 2;
+
       if (state.chromatic > 1) {
         ctx.save();
         ctx.translate(state.chromatic, 0);
         ctx.globalAlpha = 0.2;
         ctx.fillStyle = '#ff0055';
-        ctx.fillRect(0,0, canvas.width, canvas.height);
+        ctx.fillRect(0,0, vWidth, vHeight);
         ctx.restore();
       }
 
-      ctx.save();
       if (state.shake > 1) {
         ctx.translate((Math.random() - 0.5) * state.shake, (Math.random() - 0.5) * state.shake);
       }
 
-      // Draw Grid with Pulse
       const gridPulse = Math.sin(state.frame * 0.05) * 0.02 + 0.05;
       ctx.strokeStyle = `rgba(204, 255, 0, ${gridPulse})`;
       ctx.lineWidth = 1;
       const gridSize = 60;
-      for (let x = 0; x < canvas.width; x += gridSize) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      for (let x = 0; x < vWidth; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, vHeight); ctx.stroke();
       }
-      for (let y = 0; y < canvas.height; y += gridSize) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      for (let y = 0; y < vHeight; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(vWidth, y); ctx.stroke();
       }
 
-      // Draw Power-ups
       state.powerUps.forEach(p => {
         ctx.save();
         ctx.translate(p.x, p.y);
@@ -303,7 +312,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         ctx.restore();
       });
 
-      // Draw Particles
       state.particles.forEach(p => {
         ctx.globalAlpha = p.life;
         ctx.fillStyle = p.color;
@@ -317,7 +325,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
       });
       ctx.globalAlpha = 1;
 
-      // Draw Bullets
       state.bullets.forEach(b => {
         ctx.fillStyle = '#ccff00';
         ctx.shadowBlur = 15;
@@ -328,12 +335,10 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         ctx.shadowBlur = 0;
       });
 
-      // Draw Enemies (Scary Visuals)
       state.enemies.forEach(e => {
         ctx.save();
         ctx.translate(e.x, e.y);
         ctx.rotate(e.angle);
-        
         const pulseScale = 1 + Math.sin(e.pulse) * 0.1;
         ctx.scale(pulseScale, pulseScale);
 
@@ -347,7 +352,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
           ctx.lineTo(-e.radius, e.radius);
           ctx.closePath();
           ctx.stroke();
-          // Inner Eye
           ctx.fillStyle = '#ff0055';
           ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
         } else if (e.type === 'REAPER') {
@@ -367,9 +371,7 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
           ctx.lineWidth = 4;
           ctx.shadowBlur = 40;
           ctx.shadowColor = '#ff0055';
-          // Outer Ring
           ctx.beginPath(); ctx.arc(0, 0, e.radius, 0, Math.PI * 2); ctx.stroke();
-          // Inner Spikes
           ctx.beginPath();
           for(let i=0; i<12; i++) {
             const a = (i/12) * Math.PI * 2 + state.frame * 0.02;
@@ -377,7 +379,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
             ctx.lineTo(Math.cos(a)*e.radius*1.2, Math.sin(a)*e.radius*1.2);
           }
           ctx.stroke();
-          // Health Bar
           ctx.fillStyle = 'rgba(255,0,0,0.3)';
           ctx.fillRect(-e.radius, -e.radius - 20, e.radius * 2, 5);
           ctx.fillStyle = '#ff0055';
@@ -386,11 +387,8 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         ctx.restore();
       });
 
-      // Draw Player/Core
       ctx.save();
       ctx.translate(centerX, centerY);
-      
-      // Core Shield Layers
       for (let i = 0; i < state.lives; i++) {
         ctx.strokeStyle = '#ccff00';
         ctx.lineWidth = 2;
@@ -401,14 +399,11 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         ctx.stroke();
       }
       ctx.globalAlpha = 1;
-
       ctx.rotate(state.playerAngle);
       ctx.strokeStyle = '#ccff00';
       ctx.lineWidth = 3;
       ctx.shadowBlur = 25;
       ctx.shadowColor = '#ccff00';
-      
-      // Hexagon Core
       ctx.beginPath();
       for (let i = 0; i < 6; i++) {
         const angle = (i / 6) * Math.PI * 2;
@@ -419,8 +414,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
       }
       ctx.closePath();
       ctx.stroke();
-
-      // Pointer
       ctx.beginPath();
       ctx.moveTo(45, 0);
       ctx.lineTo(30, -15);
@@ -428,24 +421,35 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
       ctx.closePath();
       ctx.fillStyle = '#ccff00';
       ctx.fill();
-
       ctx.restore();
       ctx.restore();
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent | TouchEvent) => {
       const rect = canvas.getBoundingClientRect();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      
+      // Account for virtual zoom scale
       gameState.current.mousePos = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+        x: (clientX - rect.left) / gameState.current.scale,
+        y: (clientY - rect.top) / gameState.current.scale
       };
     };
 
-    const handleMouseDown = () => {
+    const handleMouseDown = (e: MouseEvent | TouchEvent) => {
       if (isPaused || gameState.current.gameOver) return;
       const state = gameState.current;
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
+      
+      // Update mouse pos on touch start
+      if ('touches' in e) {
+        handleMouseMove(e);
+      }
+
+      const vWidth = canvas.width / state.scale;
+      const vHeight = canvas.height / state.scale;
+      const centerX = vWidth / 2;
+      const centerY = vHeight / 2;
       
       const fire = (angle: number) => {
         const vx = Math.cos(angle) * 12;
@@ -458,7 +462,6 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         });
       };
 
-      // Blaster upgrades by stage
       if (state.powerType === 'TRIPLE' || state.stage >= 4) {
         fire(state.playerAngle);
         fire(state.playerAngle - 0.2);
@@ -475,41 +478,46 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
 
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('touchstart', handleMouseDown, { passive: false });
+    canvas.addEventListener('touchmove', handleMouseMove, { passive: false });
+    
     requestRef.current = requestAnimationFrame(update);
 
     return () => {
       window.removeEventListener('resize', resize);
       canvas.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('touchstart', handleMouseDown);
+      canvas.removeEventListener('touchmove', handleMouseMove);
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, [isPaused, onGameOver, onStageComplete]);
 
   return (
-    <div className="relative w-full h-full cursor-crosshair overflow-hidden bg-[#050505]">
+    <div className="relative w-full h-full cursor-crosshair overflow-hidden bg-[#050505] touch-none">
       <canvas ref={canvasRef} className="w-full h-full" />
       
       {/* HUD */}
-      <div className="absolute top-8 left-8 pointer-events-none">
-        <div className="text-[10px] font-black text-[#ccff00] tracking-[0.5em] uppercase mb-1">STAGE {currentStage} // Core Integrity: {lives * 33}%</div>
-        <div className="text-5xl font-black text-white tracking-tighter">SCORE: {score.toString().padStart(6, '0')}</div>
+      <div className="absolute top-4 left-4 md:top-8 md:left-8 pointer-events-none">
+        <div className="text-[8px] md:text-[10px] font-black text-[#ccff00] tracking-[0.3em] md:tracking-[0.5em] uppercase mb-1">STAGE {currentStage} // Core Integrity: {lives * 33}%</div>
+        <div className="text-3xl md:text-5xl font-black text-white tracking-tighter">SCORE: {score.toString().padStart(6, '0')}</div>
         
         {activePower && (
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="mt-4 inline-block bg-[#ccff00] text-black px-4 py-1 text-[10px] font-black tracking-widest uppercase"
+            className="mt-2 md:mt-4 inline-block bg-[#ccff00] text-black px-3 py-1 text-[8px] md:text-[10px] font-black tracking-widest uppercase"
           >
             {activePower} ACTIVE
           </motion.div>
         )}
       </div>
 
-      <div className="absolute bottom-8 right-8 pointer-events-none text-right">
-        <div className="text-[10px] font-black text-white/40 tracking-widest uppercase mb-2 italic">Defensive Protocol v2.0</div>
-        <div className="flex space-x-2 justify-end">
+      <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 pointer-events-none text-right">
+        <div className="text-[8px] md:text-[10px] font-black text-white/40 tracking-widest uppercase mb-2 italic">Defensive Protocol v2.0</div>
+        <div className="flex space-x-1 md:space-x-2 justify-end">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className={`w-10 h-1 transition-colors duration-500 ${i < lives ? 'bg-[#ccff00]' : 'bg-white/10'}`} />
+            <div key={i} className={`w-6 md:w-10 h-1 transition-colors duration-500 ${i < lives ? 'bg-[#ccff00]' : 'bg-white/10'}`} />
           ))}
         </div>
       </div>

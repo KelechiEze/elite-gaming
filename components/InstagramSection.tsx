@@ -26,7 +26,7 @@ const InstagramSection: React.FC<InstagramSectionProps> = ({ onNotify }) => {
 
   return (
     <section className="bg-black py-20 md:py-32 relative overflow-hidden">
-      <div className="px-6 md:px-12 lg:px-24 mb-16 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 md:gap-0">
+      <div className="px-4 md:px-12 lg:px-24 mb-16 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 md:gap-0">
         <button 
           onClick={handleOpenInsta}
           className="relative bg-[#ccff00] text-black px-10 py-4 text-[10px] md:text-xs font-black tracking-widest flex items-center space-x-3 group"

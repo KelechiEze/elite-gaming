@@ -47,7 +47,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, onNotify }) => {
   };
 
   return (
-    <footer className="bg-[#050505] pt-20 md:pt-32 pb-12 px-6 md:px-12 lg:px-24 border-t border-white/5 relative z-20">
+    <footer className="bg-[#050505] pt-20 md:pt-32 pb-12 px-4 md:px-12 lg:px-24 border-t border-white/5 relative z-20 overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16 mb-20 md:mb-24">
         
         {sections.map((s, i) => (

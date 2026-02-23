@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const StatsSection: React.FC = () => {
   return (
-    <section className="relative py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] overflow-hidden">
+    <section className="relative py-16 md:py-32 px-4 md:px-12 lg:px-24 bg-[#0a0a0a] overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-16">
         
         {/* Left Side: Text and Grid */}
@@ -48,7 +48,7 @@ const StatsSection: React.FC = () => {
         <div className="flex-1 relative w-full">
           <div className="relative z-10 w-full">
             {/* Background Big Text - Scaled for mobile */}
-            <div className="absolute -top-12 md:-top-24 right-0 md:-right-12 select-none pointer-events-none opacity-20">
+            <div className="absolute -top-12 md:-top-24 right-0 md:-right-8 select-none pointer-events-none opacity-20">
               <span className="text-[8px] md:text-[10px] font-black text-white tracking-[0.5em] block mb-2 text-right">LEADING GAMING HUB</span>
               <span className="text-8xl sm:text-[120px] md:text-[200px] font-black text-white leading-none tracking-tighter block opacity-40">2024</span>
             </div>

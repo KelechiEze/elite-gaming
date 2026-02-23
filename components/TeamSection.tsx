@@ -11,7 +11,7 @@ const TeamSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-[#050505] py-32 px-24 border-t border-white/5">
+    <section className="bg-[#050505] py-20 md:py-32 px-4 md:px-12 lg:px-24 border-t border-white/5 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-20 space-y-4">
@@ -22,7 +22,7 @@ const TeamSection: React.FC = () => {
              <div className="w-6 h-[2px] bg-[#ccff00]" />
              <div className="w-1 h-1 bg-[#ccff00]" />
           </div>
-          <h2 className="text-6xl font-black text-white tracking-tighter uppercase leading-none">
+          <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none">
             DRAUQS RENGISED EMAG
           </h2>
         </div>

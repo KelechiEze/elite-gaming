@@ -1,6 +1,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { Zap, Target, ShieldAlert, ChevronRight } from 'lucide-react';
 import { SlideData } from '../types';
 import SlideContent from './SlideContent';
 import SidebarUI from './SidebarUI';
@@ -36,9 +37,10 @@ const AUTO_PLAY_INTERVAL = 8000;
 
 interface HeroCarouselProps {
   onWatchTrailer: () => void;
+  onNavigate: (tab: string) => void;
 }
 
-const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer }) => {
+const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate }) => {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const dragX = useMotionValue(0);
@@ -76,7 +78,57 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer }) => {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       </div>
 
-      <div className="relative w-full h-full max-w-[1920px] mx-auto overflow-hidden flex items-center">
+      {/* NEON STRIKE PROMO BUTTON */}
+      <motion.div 
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 1, duration: 0.8 }}
+        className="absolute top-24 right-4 md:right-24 z-50 pointer-events-auto"
+      >
+        <button 
+          onClick={() => onNavigate('GAME')}
+          className="group relative flex items-center bg-black/40 backdrop-blur-xl border border-[#ccff00]/30 p-1 pr-6 rounded-full overflow-hidden transition-all hover:border-[#ccff00] hover:scale-105 active:scale-95"
+        >
+          {/* Animated Background Glow */}
+          <motion.div 
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute inset-0 bg-[#ccff00]/10 blur-xl"
+          />
+          
+          <div className="relative w-12 h-12 md:w-14 md:h-14 bg-[#ccff00] rounded-full flex items-center justify-center overflow-hidden">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 opacity-20"
+            >
+              <Target className="w-full h-full text-black scale-150" />
+            </motion.div>
+            <Zap className="w-6 h-6 md:w-7 md:h-7 text-black fill-current relative z-10" />
+          </div>
+
+          <div className="ml-4 text-left">
+            <div className="flex items-center space-x-2">
+              <span className="text-[8px] font-black text-[#ccff00] tracking-widest uppercase animate-pulse">Live Now</span>
+              <div className="w-1 h-1 bg-[#ccff00] rounded-full animate-ping" />
+            </div>
+            <div className="text-xs md:text-sm font-black text-white tracking-tighter uppercase leading-none">
+              PLAY NEON STRIKE
+            </div>
+            <div className="text-[8px] text-gray-400 font-bold tracking-widest uppercase mt-1 flex items-center group-hover:text-[#ccff00] transition-colors">
+              Enter the Grid <ChevronRight className="w-2 h-2 ml-1" />
+            </div>
+          </div>
+
+          {/* Glitch Effect Elements */}
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-[#ccff00]/50 -translate-x-full group-hover:animate-glitch-line" />
+        </button>
+      </motion.div>
+
+      <div className="relative w-full h-full max-w-[1920px] mx-auto overflow-hidden flex items-center pb-32 md:pb-48">
         <AnimatePresence mode="wait" initial={false} custom={direction}>
           <motion.div
             key={currentSlide.id}
@@ -86,8 +138,8 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer }) => {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.9}
             onDragEnd={(e, info) => {
-              if (info.offset.x < -150) paginate(1);
-              else if (info.offset.x > 150) paginate(-1);
+              if (info.offset.x < -100) paginate(1);
+              else if (info.offset.x > 100) paginate(-1);
             }}
             initial={{ opacity: 0, scale: 0.8, x: direction > 0 ? 300 : -300 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -114,12 +166,15 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer }) => {
                 slide={currentSlide} 
                 onWatchTrailer={onWatchTrailer}
                 onInitialize={handleInitialize}
+                onPlayGame={() => onNavigate('GAME')}
               />
             </div>
           </motion.div>
         </AnimatePresence>
 
-        <SidebarUI currentIndex={index} total={SLIDES.length} />
+        <div className="hidden md:block">
+          <SidebarUI currentIndex={index} total={SLIDES.length} />
+        </div>
       </div>
 
       <div className="absolute bottom-0 left-0 w-full h-1 bg-white/5 z-50">

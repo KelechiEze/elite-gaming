@@ -19,7 +19,7 @@ const TestimonialsSection: React.FC = () => {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 w-full max-w-7xl px-24 flex flex-col items-center text-center">
+      <div className="relative z-10 w-full max-w-7xl px-4 md:px-12 lg:px-24 flex flex-col items-center text-center">
         {/* Top Label */}
         <div className="flex items-center space-x-2 mb-12">
           <div className="w-2 h-2 bg-[#ccff00]" />
@@ -47,7 +47,7 @@ const TestimonialsSection: React.FC = () => {
         </div>
 
         {/* User Info & Nav Buttons */}
-        <div className="w-full mt-16 flex items-center justify-between">
+        <div className="w-full mt-12 md:mt-16 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0">
           {/* Nav Buttons */}
           <div className="flex space-x-4">
             <button className="w-14 h-14 border border-white/20 flex items-center justify-center hover:bg-[#ccff00] hover:text-black transition-all">

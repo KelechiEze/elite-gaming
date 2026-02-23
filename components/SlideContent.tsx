@@ -8,11 +8,12 @@ interface SlideContentProps {
   slide: SlideData;
   onWatchTrailer: () => void;
   onInitialize: () => void;
+  onPlayGame?: () => void;
 }
 
-const SlideContent: React.FC<SlideContentProps> = ({ slide, onWatchTrailer, onInitialize }) => {
+const SlideContent: React.FC<SlideContentProps> = ({ slide, onWatchTrailer, onInitialize, onPlayGame }) => {
   return (
-    <div className="relative z-30 w-full px-6 md:px-12 lg:px-24 flex flex-col items-center md:items-end text-center md:text-right select-none">
+    <div className="relative z-30 w-full px-4 md:px-12 lg:px-24 flex flex-col items-center md:items-end text-center md:text-right select-none">
       <motion.div 
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -29,7 +30,7 @@ const SlideContent: React.FC<SlideContentProps> = ({ slide, onWatchTrailer, onIn
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="text-3xl sm:text-5xl md:text-7xl lg:text-9xl font-black leading-[0.9] max-w-5xl tracking-tighter uppercase"
+        className="text-2xl sm:text-5xl md:text-7xl lg:text-9xl font-black leading-[0.9] max-w-5xl tracking-tighter uppercase"
       >
         {slide.title}
       </motion.h1>
@@ -47,8 +48,24 @@ const SlideContent: React.FC<SlideContentProps> = ({ slide, onWatchTrailer, onIn
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="mt-10 md:mt-12 flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12"
+        className="mt-8 md:mt-12 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-12"
       >
+        {onPlayGame && (
+          <button 
+            onClick={onPlayGame}
+            className="group relative px-10 py-5 bg-white text-black font-black text-sm tracking-[0.2em] uppercase overflow-hidden transition-all hover:bg-[#ccff00] hover:scale-105 active:scale-95"
+          >
+            <motion.div 
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="absolute inset-0 bg-[#ccff00]/20"
+            />
+            <span className="relative z-10 flex items-center">
+              PLAY NEON STRIKE <Play className="w-4 h-4 ml-3 fill-current" />
+            </span>
+          </button>
+        )}
+
         <div 
           onClick={onWatchTrailer}
           className="flex items-center space-x-4 cursor-pointer group"

@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+// System initialized
 import Navbar from './components/Navbar';
 import HeroCarousel from './components/HeroCarousel';
 import StatsSection from './components/StatsSection';
@@ -122,15 +123,15 @@ const App: React.FC = () => {
         onOpenMenu={() => setIsMenuOpen(true)}
       />
       
-      <div className="fixed top-0 left-[60px] w-[1px] h-full bg-white/10 z-10 pointer-events-none" />
-      <div className="fixed top-0 right-[60px] w-[1px] h-full bg-white/10 z-10 pointer-events-none" />
+      <div className="hidden lg:block fixed top-0 left-[60px] w-[1px] h-full bg-white/10 z-10 pointer-events-none" />
+      <div className="hidden lg:block fixed top-0 right-[60px] w-[1px] h-full bg-white/10 z-10 pointer-events-none" />
 
       <main className="relative z-20 pt-20">
         <AnimatePresence mode="wait">
           {activeTab === 'HOME' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
               <section className="h-[calc(100vh-80px)] w-full relative">
-                <HeroCarousel onWatchTrailer={() => setIsVideoOpen(true)} />
+                <HeroCarousel onWatchTrailer={() => setIsVideoOpen(true)} onNavigate={handleNavigate} />
                 <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] z-[5]" />
               </section>
               <StatsSection />

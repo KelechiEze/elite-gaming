@@ -8,7 +8,7 @@ interface TechnicalSectionProps {
 
 const TechnicalSection: React.FC<TechnicalSectionProps> = ({ onNavigate }) => {
   return (
-    <section className="bg-[#050505] py-20 md:py-32 px-6 md:px-12 lg:px-24 relative overflow-hidden">
+    <section className="bg-[#050505] py-16 md:py-32 px-4 md:px-12 lg:px-24 relative overflow-hidden">
       <div className="flex flex-col md:flex-row items-center md:items-start justify-between mb-16 md:mb-24 gap-8 md:gap-0">
         <button 
           onClick={() => onNavigate('ABOUT')}
@@ -32,8 +32,8 @@ const TechnicalSection: React.FC<TechnicalSectionProps> = ({ onNavigate }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
-        <div className="relative group">
-          <div className="absolute -top-6 -left-6 md:-top-12 md:-left-12 z-20">
+        <div className="relative group w-full">
+          <div className="absolute -top-4 -left-4 md:-top-12 md:-left-12 z-20">
             <ArrowUpLeft className="w-10 h-10 md:w-16 md:h-16 text-[#ccff00]" strokeWidth={3} />
           </div>
           <div className="relative aspect-video overflow-hidden border border-white/10">

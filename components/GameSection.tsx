@@ -143,10 +143,10 @@ const GameSection: React.FC = () => {
             {/* Pause Button */}
             <button 
               onClick={() => setIsPaused(!isPaused)}
-              className="absolute top-8 right-8 z-50 bg-white/10 hover:bg-[#ccff00] hover:text-black p-4 backdrop-blur-md border border-white/10 transition-all group"
+              className="absolute bottom-8 left-8 md:bottom-auto md:top-8 md:right-8 md:left-auto z-50 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-[#ccff00] hover:text-black flex items-center justify-center backdrop-blur-md border border-white/10 transition-all group"
             >
               {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
-              <span className="absolute right-full mr-4 top-1/2 -translate-y-1/2 text-[10px] font-black tracking-widest text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              <span className="absolute left-full ml-4 md:left-auto md:top-full md:mt-4 md:right-0 text-[10px] font-black tracking-widest text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none text-right">
                 {isPaused ? 'RESUME SYSTEM' : 'PAUSE SYSTEM'}
               </span>
             </button>
