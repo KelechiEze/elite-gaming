@@ -18,7 +18,7 @@ const ShopSpecs: React.FC = () => {
               <div className="absolute inset-0 border border-[#ccff00]/20 translate-x-4 translate-y-4 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500" />
               <div className="absolute inset-0 border border-white/10 -translate-x-4 -translate-y-4 group-hover:-translate-x-6 group-hover:-translate-y-6 transition-transform duration-500" />
               <img 
-                src="https://images.unsplash.com/photo-1587202392491-e0e0c8f1f447?q=80&w=800&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?q=80&w=800&auto=format&fit=crop" 
                 className="w-full h-full object-cover grayscale brightness-50 contrast-125"
                 alt="Switch Detail"
               />

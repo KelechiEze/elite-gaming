@@ -11,7 +11,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, onNavigate, cartCount, onOpenCart, onOpenMenu }) => {
-  const navItems = ['HOME', 'ABOUT', 'MATCHES', 'SHOP', 'BLOG', 'CONTACT'];
+  const navItems = ['HOME', 'ABOUT', 'MATCHES', 'SHOP', 'BLOG', 'GAME', 'CONTACT'];
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-20 bg-black/60 backdrop-blur-md border-b border-white/10">

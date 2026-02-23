@@ -22,6 +22,7 @@ import ShopBundles from './components/ShopBundles';
 import BlogHero from './components/BlogHero';
 import BlogList from './components/BlogList';
 import BlogArticleView from './components/BlogArticleView';
+import GameSection from './components/GameSection';
 import ContactHero from './components/ContactHero';
 import ContactForm from './components/ContactForm';
 import Footer from './components/Footer';
@@ -175,6 +176,12 @@ const App: React.FC = () => {
               <BlogHero />
               <BlogList onReadArticle={handleReadArticle} onNotify={(msg) => addNotification(msg, 'ALERT')} />
               <InstagramSection onNotify={(msg) => addNotification(msg, 'SUCCESS')} />
+            </motion.div>
+          )}
+
+          {activeTab === 'GAME' && (
+            <motion.div key="game" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+              <GameSection />
             </motion.div>
           )}
 

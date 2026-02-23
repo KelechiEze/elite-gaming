@@ -7,7 +7,7 @@ const ShopHero: React.FC = () => {
     <section className="relative w-full h-[50vh] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop" 
+          src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop" 
           className="w-full h-full object-cover grayscale brightness-[0.4]"
           alt="Gaming Gear"
         />

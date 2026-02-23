@@ -10,7 +10,7 @@ interface MenuOverlayProps {
 }
 
 const MenuOverlay: React.FC<MenuOverlayProps> = ({ activeTab, onNavigate, onClose }) => {
-  const menuItems = ['HOME', 'ABOUT', 'MATCHES', 'SHOP', 'BLOG', 'CONTACT'];
+  const menuItems = ['HOME', 'ABOUT', 'MATCHES', 'SHOP', 'BLOG', 'GAME', 'CONTACT'];
 
   return (
     <motion.div 

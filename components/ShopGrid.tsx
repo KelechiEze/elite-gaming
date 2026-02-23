@@ -10,12 +10,12 @@ interface ShopGridProps {
 
 const ShopGrid: React.FC<ShopGridProps> = ({ onAddToCart, onPreview }) => {
   const products = [
-    { id: 1, name: "APEX SENSOR X-1", category: "MICE", price: "$129.99", img: "https://images.unsplash.com/photo-1527814050087-379371549a28?q=80&w=800&auto=format&fit=crop", desc: "Highest precision optical sensor available in the consumer market, tuned for e-sports." },
-    { id: 2, name: "NEON-MECH V4", category: "KEYBOARDS", price: "$249.00", img: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?q=80&w=800&auto=format&fit=crop", desc: "Mechanical switches with zero-debounce technology and per-key RGB lighting." },
-    { id: 3, name: "CRYSTAL AUDIO PRO", category: "HEADSETS", price: "$189.50", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop", desc: "Studio-grade spatial audio with noise-canceling beamforming microphone." },
+    { id: 1, name: "APEX SENSOR X-1", category: "MICE", price: "$129.99", img: "https://images.unsplash.com/photo-1613141411244-0e4ac259d217?q=80&w=800&auto=format&fit=crop", desc: "Highest precision optical sensor available in the consumer market, tuned for e-sports." },
+    { id: 2, name: "NEON-MECH V4", category: "KEYBOARDS", price: "$249.00", img: "https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=800&auto=format&fit=crop", desc: "Mechanical switches with zero-debounce technology and per-key RGB lighting." },
+    { id: 3, name: "CRYSTAL AUDIO PRO", category: "HEADSETS", price: "$189.50", img: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=800&auto=format&fit=crop", desc: "Studio-grade spatial audio with noise-canceling beamforming microphone." },
     { id: 4, name: "LATENCY-ZERO PAD", category: "ACCESSORIES", price: "$45.00", img: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?q=80&w=800&auto=format&fit=crop", desc: "Frictionless glass-infused surface for consistent tracking in high-speed matches." },
     { id: 5, name: "VIRTUAL SIGHT G2", category: "VR GEAR", price: "$599.99", img: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?q=80&w=800&auto=format&fit=crop", desc: "4K per-eye resolution with ultra-wide 130-degree field of vision." },
-    { id: 6, name: "CORE-MESH CHAIR", category: "FURNITURE", price: "$350.00", img: "https://images.unsplash.com/photo-1598550476439-6847785fce66?q=80&w=800&auto=format&fit=crop", desc: "Ergonomic cooling mesh with adjustable lumbar support for long sessions." }
+    { id: 6, name: "CORE-MESH CHAIR", category: "FURNITURE", price: "$350.00", img: "https://images.unsplash.com/photo-1614377284368-a6d4f911edc7?q=80&w=800&auto=format&fit=crop", desc: "Ergonomic cooling mesh with adjustable lumbar support for long sessions." }
   ];
 
   return (
