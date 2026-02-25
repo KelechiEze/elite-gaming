@@ -48,6 +48,10 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
   const [lives, setLives] = useState(3);
   const [activePower, setActivePower] = useState<string | null>(null);
   
+  // Refs to track last rendered values to prevent redundant state updates
+  const lastRenderedScore = useRef(0);
+  const lastRenderedLives = useRef(3);
+
   const gameState = useRef({
     playerAngle: 0,
     bullets: [] as Bullet[],
@@ -184,7 +188,13 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         if (dist < 40) {
           if (p.type === 'TRIPLE') { state.powerType = 'TRIPLE'; state.powerTimer = 600; setActivePower('TRIPLE SHOT'); }
           if (p.type === 'RAPID') { state.powerType = 'RAPID'; state.powerTimer = 600; setActivePower('RAPID FIRE'); }
-          if (p.type === 'SHIELD') { state.lives = Math.min(3, state.lives + 1); setLives(state.lives); }
+          if (p.type === 'SHIELD') { 
+            state.lives = Math.min(3, state.lives + 1); 
+            if (state.lives !== lastRenderedLives.current) {
+              setLives(state.lives);
+              lastRenderedLives.current = state.lives;
+            }
+          }
           createExplosion(p.x, p.y, '#ccff00', 30);
           return false;
         }
@@ -208,7 +218,10 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
         if (distToPlayer < 40) {
           state.enemies.splice(eIdx, 1);
           state.lives--;
-          setLives(state.lives);
+          if (state.lives !== lastRenderedLives.current) {
+            setLives(state.lives);
+            lastRenderedLives.current = state.lives;
+          }
           state.shake = 15;
           state.chromatic = 20;
           createExplosion(centerX, centerY, '#ff0055', 40);
@@ -230,7 +243,11 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
               createExplosion(e.x, e.y, e.type === 'BOSS' ? '#ff0055' : '#ccff00', e.type === 'BOSS' ? 100 : 20);
               state.enemies.splice(eIdx, 1);
               state.score += e.type === 'BOSS' ? 500 : 10;
-              setScore(state.score);
+              
+              if (state.score >= lastRenderedScore.current + 10) {
+                setScore(state.score);
+                lastRenderedScore.current = state.score;
+              }
               
               if (Math.random() > 0.85) {
                 const types: ('TRIPLE' | 'RAPID' | 'SHIELD')[] = ['TRIPLE', 'RAPID', 'SHIELD'];
@@ -499,16 +516,16 @@ const NeonStrikeGame: React.FC<NeonStrikeGameProps> = ({ onGameOver, onStageComp
       
       {/* HUD */}
       <div className="absolute top-4 left-4 md:top-8 md:left-8 pointer-events-none">
-        <div className="text-[8px] md:text-[10px] font-black text-[#ccff00] tracking-[0.3em] md:tracking-[0.5em] uppercase mb-1">STAGE {currentStage} // Core Integrity: {lives * 33}%</div>
+        <div className="text-[7px] md:text-[10px] font-black text-[#ccff00] tracking-[0.2em] md:tracking-[0.5em] uppercase mb-0.5 md:mb-1">STAGE {currentStage} // Integrity: {lives * 33}%</div>
         <div className="text-3xl md:text-5xl font-black text-white tracking-tighter">SCORE: {score.toString().padStart(6, '0')}</div>
         
         {activePower && (
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="mt-2 md:mt-4 inline-block bg-[#ccff00] text-black px-3 py-1 text-[8px] md:text-[10px] font-black tracking-widest uppercase"
+            className="mt-1 md:mt-4 inline-block bg-[#ccff00] text-black px-2 py-0.5 md:px-3 md:py-1 text-[7px] md:text-[10px] font-black tracking-widest uppercase"
           >
-            {activePower} ACTIVE
+            {activePower}
           </motion.div>
         )}
       </div>

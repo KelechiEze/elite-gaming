@@ -84,12 +84,12 @@ const GameSection: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
             className="relative z-10 w-full max-w-6xl px-6"
           >
-            <div className="text-center mb-16">
-              <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase mb-4">SELECT YOUR MISSION</h2>
-              <p className="text-gray-500 tracking-widest uppercase text-xs font-bold">Choose a protocol to initialize</p>
+            <div className="text-center mb-8 md:mb-16">
+              <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase mb-4">SELECT MISSION</h2>
+              <p className="text-gray-500 tracking-widest uppercase text-[10px] md:text-xs font-bold">Choose a protocol to initialize</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-h-[60vh] md:max-h-none overflow-y-auto md:overflow-visible px-2">
               {/* Neon Strike */}
               <div 
                 onClick={() => selectGame('NEON_STRIKE')}
@@ -146,7 +146,7 @@ const GameSection: React.FC = () => {
               </span>
             </div>
             
-            <h1 className="text-7xl md:text-9xl font-black text-white tracking-tighter uppercase leading-none mb-8">
+            <h1 className="text-5xl md:text-9xl font-black text-white tracking-tighter uppercase leading-none mb-8">
               {selectedGame === 'NEON_STRIKE' ? (
                 <>NEON<br /><span className="text-[#ccff00]">STRIKE</span></>
               ) : (
@@ -154,7 +154,7 @@ const GameSection: React.FC = () => {
               )}
             </h1>
 
-            <p className="text-gray-500 text-lg mb-12 max-w-md mx-auto italic">
+            <p className="text-gray-500 text-sm md:text-lg mb-8 md:text-12 max-w-md mx-auto italic">
               {selectedGame === 'NEON_STRIKE' 
                 ? '"The core is under attack by data corruptors. Deploy the defense protocol and survive the onslaught."'
                 : '"The arena is alive. Shifting geometry and collapsing paths await. Survive the void."'}
@@ -170,23 +170,26 @@ const GameSection: React.FC = () => {
                 <Play className="w-5 h-5 fill-current relative" />
               </button>
               
-              <div className="flex items-center space-x-8 text-white/40 text-xs font-bold tracking-widest">
+              <div className="flex items-center space-x-4 md:space-x-8 text-white/40 text-[10px] md:text-xs font-bold tracking-widest">
                 {selectedGame === 'NEON_STRIKE' ? (
                   <>
                     <div className="flex items-center space-x-2">
                       <span className="w-2 h-2 bg-white/20 rounded-full" />
-                      <span>MOUSE TO AIM</span>
+                      <span className="hidden md:inline">MOUSE TO AIM</span>
+                      <span className="md:hidden">TOUCH TO AIM</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="w-2 h-2 bg-white/20 rounded-full" />
-                      <span>CLICK TO FIRE</span>
+                      <span className="hidden md:inline">CLICK TO FIRE</span>
+                      <span className="md:hidden">TAP TO FIRE</span>
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="flex items-center space-x-2">
                       <span className="w-2 h-2 bg-white/20 rounded-full" />
-                      <span>W A S D TO MOVE</span>
+                      <span className="hidden md:inline">W A S D TO MOVE</span>
+                      <span className="md:hidden">TOUCH TO MOVE</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="w-2 h-2 bg-white/20 rounded-full" />
@@ -297,20 +300,20 @@ const GameSection: React.FC = () => {
             className="relative z-10 text-center"
           >
             <div className="mb-8">
-              <div className={`${selectedGame === 'NEON_STRIKE' ? 'text-[#ff0055]' : 'text-[#00f2ff]'} text-xs font-black tracking-[0.5em] uppercase mb-4`}>
+              <div className={`${selectedGame === 'NEON_STRIKE' ? 'text-[#ff0055]' : 'text-[#00f2ff]'} text-[10px] md:text-xs font-black tracking-[0.3em] md:tracking-[0.5em] uppercase mb-4`}>
                 {selectedGame === 'NEON_STRIKE' ? 'Core Integrity Compromised' : 'Arena Collapse'}
               </div>
-              <h2 className="text-8xl font-black text-white tracking-tighter uppercase leading-none">MISSION<br />FAILED</h2>
+              <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter uppercase leading-none">MISSION<br />FAILED</h2>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 max-w-sm mx-auto mb-12">
-              <div className="bg-white/5 border border-white/10 p-6">
-                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Final Score</div>
-                <div className={`text-4xl font-black ${selectedGame === 'NEON_STRIKE' ? 'text-[#ccff00]' : 'text-[#00f2ff]'}`}>{lastScore}</div>
+            <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-sm mx-auto mb-12">
+              <div className="bg-white/5 border border-white/10 p-4 md:p-6">
+                <div className="text-[8px] md:text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Final Score</div>
+                <div className={`text-2xl md:text-4xl font-black ${selectedGame === 'NEON_STRIKE' ? 'text-[#ccff00]' : 'text-[#00f2ff]'}`}>{lastScore}</div>
               </div>
-              <div className="bg-white/5 border border-white/10 p-6">
-                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">High Score</div>
-                <div className="text-4xl font-black text-white">{highScore[selectedGame] || 0}</div>
+              <div className="bg-white/5 border border-white/10 p-4 md:p-6">
+                <div className="text-[8px] md:text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">High Score</div>
+                <div className="text-2xl md:text-4xl font-black text-white">{highScore[selectedGame] || 0}</div>
               </div>
             </div>
 

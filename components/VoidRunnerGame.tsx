@@ -31,12 +31,17 @@ const VoidRunnerGame: React.FC<VoidRunnerGameProps> = ({ onGameOver, onStageComp
   const [score, setScore] = useState(0);
   const [survivalTime, setSurvivalTime] = useState(0);
   
+  // Refs to track last rendered values to prevent redundant state updates
+  const lastRenderedScore = useRef(0);
+  const lastRenderedSurvival = useRef(0);
+  
   const gameState = useRef({
     player: { x: 0, y: 0, vx: 0, vy: 0 },
     walls: [] as Wall[],
     speed: INITIAL_SPEED,
     frame: 0,
     keys: { w: false, a: false, s: false, d: false },
+    touch: { active: false, x: 0, y: 0 },
     lastSpawn: 0,
     gameActive: true,
     intensity: 0,
@@ -55,11 +60,31 @@ const VoidRunnerGame: React.FC<VoidRunnerGameProps> = ({ onGameOver, onStageComp
     gameState.current.gameActive = true;
     gameState.current.walls = [];
     gameState.current.lastSpawn = 0;
+    gameState.current.touch.active = false;
+    lastRenderedScore.current = 0;
+    lastRenderedSurvival.current = 0;
   }, []);
 
   const spawnWall = useCallback((width: number, height: number) => {
+    const state = gameState.current;
+    const { player } = state;
     const id = Math.random();
-    const side = Math.floor(Math.random() * 4);
+    
+    // Targeted spawn logic: 80% chance to spawn from the side the player is closest to
+    let side: number;
+    const dists = [
+      player.y, // Top (0)
+      width - player.x, // Right (1)
+      height - player.y, // Bottom (2)
+      player.x // Left (3)
+    ];
+    
+    if (Math.random() < 0.8) {
+      side = dists.indexOf(Math.min(...dists));
+    } else {
+      side = Math.floor(Math.random() * 4);
+    }
+
     let x = 0, y = 0;
     
     // Difficulty scaling based on stage
@@ -68,10 +93,11 @@ const VoidRunnerGame: React.FC<VoidRunnerGameProps> = ({ onGameOver, onStageComp
     const wallHeight = (15 + Math.random() * 30) * sizeMult;
     const speedMult = 0.8 + (currentStage * 0.2);
 
-    if (side === 0) { x = Math.random() * width; y = -150; }
-    else if (side === 1) { x = width + 150; y = Math.random() * height; }
-    else if (side === 2) { x = Math.random() * width; y = height + 150; }
-    else { x = -150; y = Math.random() * height; }
+    // Spawn at the edge, but biased towards player coordinate to flush them out
+    if (side === 0) { x = player.x + (Math.random() - 0.5) * 400; y = -150; }
+    else if (side === 1) { x = width + 150; y = player.y + (Math.random() - 0.5) * 400; }
+    else if (side === 2) { x = player.x + (Math.random() - 0.5) * 400; y = height + 150; }
+    else { x = -150; y = player.y + (Math.random() - 0.5) * 400; }
 
     const newWall: Wall = {
       id,
@@ -126,8 +152,26 @@ const VoidRunnerGame: React.FC<VoidRunnerGameProps> = ({ onGameOver, onStageComp
       }
     };
 
+    const handleTouch = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        gameState.current.touch = {
+          active: true,
+          x: e.touches[0].clientX - rect.left,
+          y: e.touches[0].clientY - rect.top
+        };
+      }
+    };
+
+    const handleTouchEnd = () => {
+      gameState.current.touch.active = false;
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchmove', handleTouch, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd);
 
     let animationFrameId: number;
 
@@ -138,15 +182,28 @@ const VoidRunnerGame: React.FC<VoidRunnerGameProps> = ({ onGameOver, onStageComp
       }
 
       const state = gameState.current;
-      const { player, keys, walls } = state;
+      const { player, keys, touch, walls } = state;
 
       // Smoother Player Movement (Higher acceleration and friction for snappier feel)
       const accel = 1.2;
       const friction = 0.94;
+      
+      // Keyboard Movement
       if (keys.w) player.vy -= accel;
       if (keys.s) player.vy += accel;
       if (keys.a) player.vx -= accel;
       if (keys.d) player.vx += accel;
+
+      // Touch Movement (Follow touch)
+      if (touch.active) {
+        const dx = touch.x - player.x;
+        const dy = touch.y - player.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 5) {
+          player.vx += (dx / dist) * accel;
+          player.vy += (dy / dist) * accel;
+        }
+      }
 
       player.vx *= friction;
       player.vy *= friction;
@@ -197,11 +254,15 @@ const VoidRunnerGame: React.FC<VoidRunnerGameProps> = ({ onGameOver, onStageComp
       
       // Update score and survival time state. 
       // We update score every 10 points to reduce render frequency.
-      // React will automatically bail out of renders if the values haven't changed.
-      if (currentScore % 10 === 0) { 
+      // We also check against refs to avoid redundant setState calls in the loop.
+      if (currentScore >= lastRenderedScore.current + 10) { 
         setScore(currentScore);
+        lastRenderedScore.current = currentScore;
       }
-      setSurvivalTime(currentSurvival);
+      if (currentSurvival !== lastRenderedSurvival.current) {
+        setSurvivalTime(currentSurvival);
+        lastRenderedSurvival.current = currentSurvival;
+      }
 
       // Stage Completion - Only trigger once per stage
       if (currentSurvival >= STAGE_DURATION * currentStage && state.gameActive) {
@@ -294,46 +355,50 @@ const VoidRunnerGame: React.FC<VoidRunnerGameProps> = ({ onGameOver, onStageComp
       window.removeEventListener('resize', resize);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      canvas.removeEventListener('touchstart', handleTouch);
+      canvas.removeEventListener('touchmove', handleTouch);
+      canvas.removeEventListener('touchend', handleTouchEnd);
       cancelAnimationFrame(animationFrameId);
     };
   }, [isPaused, onGameOver, onStageComplete, spawnWall, initPlayer, currentStage]);
 
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-black">
+    <div className="relative w-full h-full overflow-hidden bg-black touch-none">
       <canvas ref={canvasRef} className="w-full h-full" />
       
       {/* HUD */}
-      <div className="absolute top-8 left-8 right-8 pointer-events-none flex justify-between items-start">
-        <div className="space-y-4">
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 p-4 rounded-xl flex items-center space-x-4">
-            <Trophy className="w-6 h-6 text-[#ccff00]" />
+      <div className="absolute top-4 left-4 right-4 md:top-8 md:left-8 md:right-8 pointer-events-none flex justify-between items-start">
+        <div className="space-y-2 md:space-y-4">
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 p-2 md:p-4 rounded-lg md:rounded-xl flex items-center space-x-2 md:space-x-4">
+            <Trophy className="w-4 h-4 md:w-6 md:h-6 text-[#ccff00]" />
             <div>
-              <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Score</div>
-              <div className="text-2xl font-black text-white">{score}</div>
+              <div className="text-[8px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest">Score</div>
+              <div className="text-xl md:text-2xl font-black text-white">{score}</div>
             </div>
           </div>
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 p-4 rounded-xl flex items-center space-x-4">
-            <Timer className="w-6 h-6 text-blue-400" />
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 p-2 md:p-4 rounded-lg md:rounded-xl flex items-center space-x-2 md:space-x-4">
+            <Timer className="w-4 h-4 md:w-6 md:h-6 text-blue-400" />
             <div>
-              <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Survival</div>
-              <div className="text-2xl font-black text-white">{survivalTime}s</div>
+              <div className="text-[8px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest">Survival</div>
+              <div className="text-lg md:text-2xl font-black text-white">{survivalTime}s</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-black/40 backdrop-blur-md border border-white/10 p-4 rounded-xl flex items-center space-x-4">
-          <Activity className={`w-6 h-6 ${gameState.current.intensity > 0.7 ? 'text-red-500 animate-pulse' : 'text-[#ccff00]'}`} />
+        <div className="bg-black/40 backdrop-blur-md border border-white/10 p-2 md:p-4 rounded-lg md:rounded-xl flex items-center space-x-2 md:space-x-4">
+          <Activity className={`w-4 h-4 md:w-6 md:h-6 ${gameState.current.intensity > 0.7 ? 'text-red-500 animate-pulse' : 'text-[#ccff00]'}`} />
           <div>
-            <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Arena Stability</div>
-            <div className="text-2xl font-black text-white">{Math.round((1 - gameState.current.intensity) * 100)}%</div>
+            <div className="text-[8px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest">Stability</div>
+            <div className="text-lg md:text-2xl font-black text-white">{Math.round((1 - gameState.current.intensity) * 100)}%</div>
           </div>
         </div>
       </div>
 
       {/* Controls Help */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md border border-white/10 px-6 py-2 rounded-full text-[10px] font-black text-white/40 tracking-widest uppercase">
-        W A S D to Navigate the Void
+      <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md border border-white/10 px-4 md:px-6 py-1 md:py-2 rounded-full text-[8px] md:text-[10px] font-black text-white/40 tracking-widest uppercase whitespace-nowrap">
+        <span className="hidden md:inline">W A S D to Navigate</span>
+        <span className="md:hidden">Touch to Navigate</span>
       </div>
     </div>
   );
