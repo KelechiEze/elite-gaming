@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Zap, Target, ShieldAlert, ChevronRight } from 'lucide-react';
@@ -67,7 +66,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate 
   const currentSlide = SLIDES[index];
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-[#050505]">
+    <div className="relative w-full h-[75vh] min-h-[600px] max-h-[900px] flex items-center justify-center overflow-hidden bg-[#050505] mb-16 md:mb-24">
       {/* Background Preview */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -83,7 +82,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate 
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: 1, duration: 0.8 }}
-        className="absolute top-24 right-4 md:right-24 z-50 pointer-events-auto"
+        className="absolute top-12 md:top-20 right-4 md:right-24 z-50 pointer-events-auto"
       >
         <button 
           onClick={() => onNavigate('GAME')}
@@ -99,7 +98,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate 
             className="absolute inset-0 bg-[#ccff00]/10 blur-xl"
           />
           
-          <div className="relative w-12 h-12 md:w-14 md:h-14 bg-[#ccff00] rounded-full flex items-center justify-center overflow-hidden">
+          <div className="relative w-10 h-10 md:w-12 md:h-12 bg-[#ccff00] rounded-full flex items-center justify-center overflow-hidden">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
@@ -107,18 +106,18 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate 
             >
               <Target className="w-full h-full text-black scale-150" />
             </motion.div>
-            <Zap className="w-6 h-6 md:w-7 md:h-7 text-black fill-current relative z-10" />
+            <Zap className="w-5 h-5 md:w-6 md:h-6 text-black fill-current relative z-10" />
           </div>
 
-          <div className="ml-4 text-left">
+          <div className="ml-3 text-left">
             <div className="flex items-center space-x-2">
-              <span className="text-[8px] font-black text-[#ccff00] tracking-widest uppercase animate-pulse">Live Now</span>
+              <span className="text-[7px] md:text-[8px] font-black text-[#ccff00] tracking-widest uppercase animate-pulse">Live Now</span>
               <div className="w-1 h-1 bg-[#ccff00] rounded-full animate-ping" />
             </div>
-            <div className="text-xs md:text-sm font-black text-white tracking-tighter uppercase leading-none">
+            <div className="text-[10px] md:text-xs font-black text-white tracking-tighter uppercase leading-none">
               PLAY NEON STRIKE
             </div>
-            <div className="text-[8px] text-gray-400 font-bold tracking-widest uppercase mt-1 flex items-center group-hover:text-[#ccff00] transition-colors">
+            <div className="text-[7px] md:text-[8px] text-gray-400 font-bold tracking-widest uppercase mt-1 flex items-center group-hover:text-[#ccff00] transition-colors">
               Enter the Grid <ChevronRight className="w-2 h-2 ml-1" />
             </div>
           </div>
@@ -128,7 +127,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate 
         </button>
       </motion.div>
 
-      <div className="relative w-full h-full max-w-[1920px] mx-auto overflow-hidden flex items-center pb-32 md:pb-48">
+      <div className="relative w-full h-full max-w-[1920px] mx-auto overflow-hidden flex items-center pb-16 md:pb-24">
         <AnimatePresence mode="wait" initial={false} custom={direction}>
           <motion.div
             key={currentSlide.id}
@@ -161,7 +160,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate 
               <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
             </div>
 
-            <div className="relative z-30 w-full">
+            <div className="relative z-30 w-full scale-90 md:scale-95">
               <SlideContent 
                 slide={currentSlide} 
                 onWatchTrailer={onWatchTrailer}
@@ -187,11 +186,11 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ onWatchTrailer, onNavigate 
         />
       </div>
 
-      <div className="absolute bottom-6 md:bottom-12 left-6 md:left-24 z-50 flex items-center space-x-4 pointer-events-none opacity-40">
-        <div className="w-8 h-8 md:w-10 md:h-10 border border-white/20 rounded-full flex items-center justify-center animate-pulse">
+      <div className="absolute bottom-4 md:bottom-8 left-4 md:left-12 z-50 flex items-center space-x-3 pointer-events-none opacity-40">
+        <div className="w-6 h-6 md:w-8 md:h-8 border border-white/20 rounded-full flex items-center justify-center animate-pulse">
            <div className="w-1 h-1 bg-[#ccff00] rounded-full" />
         </div>
-        <span className="text-[8px] md:text-[10px] font-black text-white tracking-[0.3em] uppercase">GRAB & PULL TO EXPLORE</span>
+        <span className="text-[7px] md:text-[9px] font-black text-white tracking-[0.2em] md:tracking-[0.3em] uppercase">GRAB & PULL TO EXPLORE</span>
       </div>
     </div>
   );
